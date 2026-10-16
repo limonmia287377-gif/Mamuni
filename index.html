@@ -6,19 +6,23 @@
 <title>Mamuni ❤️</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{
+ margin:0;
+ padding:0;
+ box-sizing:border-box;
+}
 
 body{
  background:#030006;
  color:white;
  overflow:hidden;
- font-family:Arial,sans-serif
+ font-family:Arial,sans-serif;
 }
 
 canvas{
  display:block;
  width:100vw;
- height:100dvh
+ height:100dvh;
 }
 
 #start{
@@ -42,37 +46,42 @@ canvas{
  padding:16px 28px;
  font-size:18px;
  box-shadow:0 0 30px #ff1685;
- cursor:pointer
+ cursor:pointer;
 }
 
 #start h2{
  color:#ff9bc9;
- text-shadow:0 0 20px #ff1685
+ text-shadow:0 0 20px #ff1685;
 }
 
 #start p{
  color:#ffc4dd;
- font-size:13px
+ font-size:13px;
 }
 
 .hide{
  opacity:0;
- pointer-events:none
+ pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
+<!-- Welcome Screen -->
+
 <div id="start">
-  <h2>For Mamuni ❤️</h2>
-  <p>A little love, made just for you...</p>
-  <button id="open">Open with Love ❤️</button>
+ <h2>For Mamuni ❤️</h2>
+ <p>A little love, made just for you...</p>
+ <button id="open">Open with Love ❤️</button>
 </div>
+
+<!-- 3D Heart Canvas -->
 
 <canvas id="canvas"></canvas>
 
-<!-- তোমার আসল গানের ফাইল -->
+<!-- Background Music -->
+
 <audio
  id="music"
  src="./ssstik.io_1792046186632.mp3"
@@ -81,15 +90,18 @@ canvas{
 </audio>
 
 <script>
+
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
 const music=document.getElementById("music");
 
-let W,H,dpr,particles=[],stars=[],texts=[];
+let W,H,dpr;
+let particles=[],stars=[],texts=[];
 
 const random=(a,b)=>Math.random()*(b-a)+a;
 
 function init(){
+
  W=innerWidth;
  H=innerHeight;
 
@@ -104,14 +116,19 @@ function init(){
  stars=[];
  texts=[];
 
- // 3D heart surface particles
+ // 3D Heart Particles
+
  for(let i=0;i<1100;i++){
+
   let t=random(0,Math.PI*2);
   let u=random(0,Math.PI);
 
   let x=16*Math.pow(Math.sin(t),3);
-  let y=13*Math.cos(t)-5*Math.cos(2*t)
-       -2*Math.cos(3*t)-Math.cos(4*t);
+
+  let y=13*Math.cos(t)
+       -5*Math.cos(2*t)
+       -2*Math.cos(3*t)
+       -Math.cos(4*t);
 
   let depth=Math.sin(u);
 
@@ -122,20 +139,26 @@ function init(){
    size:random(1.1,2.7),
    phase:random(0,6.28)
   });
+
  }
 
- // Twinkling stars
+ // Twinkling Stars
+
  for(let i=0;i<100;i++){
+
   stars.push({
    x:random(0,W),
    y:random(0,H),
    r:random(.5,2),
    p:random(0,6.28)
   });
+
  }
 
- // Floating love messages
+ // Floating Love Messages
+
  for(let i=0;i<35;i++){
+
   texts.push({
    x:random(0,W),
    y:random(0,H),
@@ -143,52 +166,81 @@ function init(){
    speed:random(12,35),
    phase:random(0,6.28)
   });
+
  }
+
 }
 
 function heart3D(ms){
+
  const time=ms/1000;
 
  ctx.fillStyle="#030006";
  ctx.fillRect(0,0,W,H);
 
+ // Stars Animation
+
  stars.forEach(s=>{
+
   ctx.globalAlpha=.2+.7*Math.abs(Math.sin(time+s.p));
+
   ctx.fillStyle="#ffc1e0";
+
   ctx.beginPath();
   ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
   ctx.fill();
+
  });
 
+ // Floating I Love You
+
  texts.forEach(p=>{
+
   p.y-=p.speed/60;
 
-  if(p.y<-30)p.y=H+20;
+  if(p.y<-30){
+   p.y=H+20;
+  }
 
   ctx.globalAlpha=.22+.35*Math.abs(Math.sin(time+p.phase));
+
   ctx.fillStyle="#ff79b7";
+
   ctx.font=p.size+"px Arial";
+
   ctx.fillText("❤️ I Love You ❤️",p.x,p.y);
+
  });
 
  ctx.globalAlpha=1;
 
+ // Heart Beat
+
  const beat=1+.055*Math.sin(time*4);
+
  const scale=Math.min(W*.022,H*.011,9)*beat;
+
  const angle=time*.65;
 
- // Heart glow
+ // 3D Heart Glow
+
  ctx.save();
+
  ctx.translate(W/2,H/2-20);
+
  ctx.scale(scale,scale);
+
  ctx.shadowColor="#ff1685";
  ctx.shadowBlur=22;
 
  let projected=[];
 
  particles.forEach(p=>{
+
   const x=p.x*Math.cos(angle)-p.z*Math.sin(angle);
+
   const z=p.x*Math.sin(angle)+p.z*Math.cos(angle);
+
   const perspective=180/(180+z);
 
   projected.push({
@@ -197,22 +249,31 @@ function heart3D(ms){
    z:z,
    size:p.size*perspective
   });
+
  });
 
  projected.sort((a,b)=>a.z-b.z);
 
  projected.forEach(p=>{
+
   ctx.globalAlpha=.5+.5*Math.sin(time*3+p.z);
+
   ctx.fillStyle=p.z>0?"#ff8ac5":"#ff1685";
 
   ctx.beginPath();
+
   ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+
   ctx.fill();
+
  });
 
  ctx.restore();
 
+ // Mamuni Name Inside Heart
+
  ctx.globalAlpha=1;
+
  ctx.shadowColor="#ff1685";
  ctx.shadowBlur=24;
 
@@ -220,36 +281,57 @@ function heart3D(ms){
 
  ctx.textAlign="center";
  ctx.textBaseline="middle";
+
  ctx.font="italic bold "+fs+"px cursive";
+
  ctx.fillStyle="#fff1f8";
+
  ctx.fillText("Mamuni",W/2,H/2);
 
+ // Small Heart Symbol
+
  ctx.shadowBlur=12;
+
  ctx.font="30px Arial";
+
  ctx.fillStyle="#ff4fa0";
+
  ctx.fillText("♡",W/2,H/2+43);
 
  ctx.shadowBlur=0;
+
  ctx.textAlign="start";
+
  ctx.globalAlpha=1;
 
  requestAnimationFrame(heart3D);
+
 }
 
-// Open button and start music
+// Start Button & Music
+
 document.getElementById("open").addEventListener("click",async()=>{
+
  try{
+
   await music.play();
+
   document.getElementById("start").classList.add("hide");
+
  }catch(e){
+
   alert("গান চালু হয়নি। MP3 ফাইলের নাম ও অবস্থান পরীক্ষা করো।");
+
  }
+
 });
 
 addEventListener("resize",init);
 
 init();
+
 requestAnimationFrame(heart3D);
+
 </script>
 
 </body>
