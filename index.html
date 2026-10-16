@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mamuni ❤️</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+ background:#030006;
+ color:white;
+ overflow:hidden;
+ font-family:Arial,sans-serif
+}
+
+canvas{
+ display:block;
+ width:100vw;
+ height:100dvh
+}
+
+#start{
+ position:fixed;
+ inset:0;
+ z-index:5;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ gap:20px;
+ background:radial-gradient(circle,#300019,#030006 70%);
+ transition:opacity .8s;
+}
+
+#start button{
+ border:1px solid #ff75b7;
+ border-radius:40px;
+ background:linear-gradient(135deg,#ff1685,#8b0053);
+ color:white;
+ padding:16px 28px;
+ font-size:18px;
+ box-shadow:0 0 30px #ff1685;
+ cursor:pointer
+}
+
+#start h2{
+ color:#ff9bc9;
+ text-shadow:0 0 20px #ff1685
+}
+
+#start p{
+ color:#ffc4dd;
+ font-size:13px
+}
+
+.hide{
+ opacity:0;
+ pointer-events:none
+}
+</style>
+</head>
+
+<body>
+
+<div id="start">
+  <h2>For Mamuni ❤️</h2>
+  <p>A little love, made just for you...</p>
+  <button id="open">Open with Love ❤️</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<!-- তোমার আসল গানের ফাইল -->
+<audio
+ id="music"
+ src="./ssstik.io_1792046186632.mp3"
+ loop
+ preload="auto">
+</audio>
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const music=document.getElementById("music");
+
+let W,H,dpr,particles=[],stars=[],texts=[];
+
+const random=(a,b)=>Math.random()*(b-a)+a;
+
+function init(){
+ W=innerWidth;
+ H=innerHeight;
+
+ dpr=Math.min(devicePixelRatio||1,2);
+
+ canvas.width=W*dpr;
+ canvas.height=H*dpr;
+
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+
+ particles=[];
+ stars=[];
+ texts=[];
+
+ // 3D heart surface particles
+ for(let i=0;i<1100;i++){
+  let t=random(0,Math.PI*2);
+  let u=random(0,Math.PI);
+
+  let x=16*Math.pow(Math.sin(t),3);
+  let y=13*Math.cos(t)-5*Math.cos(2*t)
+       -2*Math.cos(3*t)-Math.cos(4*t);
+
+  let depth=Math.sin(u);
+
+  particles.push({
+   x:x*depth,
+   y:-y*depth,
+   z:Math.cos(u)*8,
+   size:random(1.1,2.7),
+   phase:random(0,6.28)
+  });
+ }
+
+ // Twinkling stars
+ for(let i=0;i<100;i++){
+  stars.push({
+   x:random(0,W),
+   y:random(0,H),
+   r:random(.5,2),
+   p:random(0,6.28)
+  });
+ }
+
+ // Floating love messages
+ for(let i=0;i<35;i++){
+  texts.push({
+   x:random(0,W),
+   y:random(0,H),
+   size:random(9,15),
+   speed:random(12,35),
+   phase:random(0,6.28)
+  });
+ }
+}
+
+function heart3D(ms){
+ const time=ms/1000;
+
+ ctx.fillStyle="#030006";
+ ctx.fillRect(0,0,W,H);
+
+ stars.forEach(s=>{
+  ctx.globalAlpha=.2+.7*Math.abs(Math.sin(time+s.p));
+  ctx.fillStyle="#ffc1e0";
+  ctx.beginPath();
+  ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+  ctx.fill();
+ });
+
+ texts.forEach(p=>{
+  p.y-=p.speed/60;
+
+  if(p.y<-30)p.y=H+20;
+
+  ctx.globalAlpha=.22+.35*Math.abs(Math.sin(time+p.phase));
+  ctx.fillStyle="#ff79b7";
+  ctx.font=p.size+"px Arial";
+  ctx.fillText("❤️ I Love You ❤️",p.x,p.y);
+ });
+
+ ctx.globalAlpha=1;
+
+ const beat=1+.055*Math.sin(time*4);
+ const scale=Math.min(W*.022,H*.011,9)*beat;
+ const angle=time*.65;
+
+ // Heart glow
+ ctx.save();
+ ctx.translate(W/2,H/2-20);
+ ctx.scale(scale,scale);
+ ctx.shadowColor="#ff1685";
+ ctx.shadowBlur=22;
+
+ let projected=[];
+
+ particles.forEach(p=>{
+  const x=p.x*Math.cos(angle)-p.z*Math.sin(angle);
+  const z=p.x*Math.sin(angle)+p.z*Math.cos(angle);
+  const perspective=180/(180+z);
+
+  projected.push({
+   x:x*perspective,
+   y:p.y*perspective,
+   z:z,
+   size:p.size*perspective
+  });
+ });
+
+ projected.sort((a,b)=>a.z-b.z);
+
+ projected.forEach(p=>{
+  ctx.globalAlpha=.5+.5*Math.sin(time*3+p.z);
+  ctx.fillStyle=p.z>0?"#ff8ac5":"#ff1685";
+
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+  ctx.fill();
+ });
+
+ ctx.restore();
+
+ ctx.globalAlpha=1;
+ ctx.shadowColor="#ff1685";
+ ctx.shadowBlur=24;
+
+ const fs=Math.min(W*.12,48);
+
+ ctx.textAlign="center";
+ ctx.textBaseline="middle";
+ ctx.font="italic bold "+fs+"px cursive";
+ ctx.fillStyle="#fff1f8";
+ ctx.fillText("Lubona",W/2,H/2);
+
+ ctx.shadowBlur=12;
+ ctx.font="30px Arial";
+ ctx.fillStyle="#ff4fa0";
+ ctx.fillText("♡",W/2,H/2+43);
+
+ ctx.shadowBlur=0;
+ ctx.textAlign="start";
+ ctx.globalAlpha=1;
+
+ requestAnimationFrame(heart3D);
+}
+
+// Open button and start music
+document.getElementById("open").addEventListener("click",async()=>{
+ try{
+  await music.play();
+  document.getElementById("start").classList.add("hide");
+ }catch(e){
+  alert("গান চালু হয়নি। MP3 ফাইলের নাম ও অবস্থান পরীক্ষা করো।");
+ }
+});
+
+addEventListener("resize",init);
+
+init();
+requestAnimationFrame(heart3D);
+</script>
+
+</body>
+</html>
